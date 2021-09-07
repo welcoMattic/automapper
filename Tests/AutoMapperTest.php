@@ -899,4 +899,19 @@ class AutoMapperTest extends AutoMapperBaseTest
         self::assertSame('Coco', $petOwnerData->getPets()[1]->name);
         self::assertSame('dog', $petOwnerData->getPets()[1]->type);
     }
+
+    public function testAdderAndRemoverWithNull()
+    {
+        $petOwner = [
+            'pets' => [
+                null,
+                null,
+            ],
+        ];
+
+        $petOwnerData = $this->autoMapper->map($petOwner, PetOwner::class);
+
+        self::assertIsArray($petOwnerData->getPets());
+        self::assertCount(0, $petOwnerData->getPets());
+    }
 }

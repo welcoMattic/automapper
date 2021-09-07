@@ -7,6 +7,11 @@ class PetOwner
     /** @var array<int, Pet> */
     private $pets;
 
+    public function __construct()
+    {
+        $this->pets = [];
+    }
+
     /**
      * @return Pet[]
      */

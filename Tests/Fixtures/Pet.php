@@ -17,4 +17,7 @@ class Pet
 
     /** @var string */
     public $name;
+
+    /** @var PetOwner */
+    public $owner;
 }

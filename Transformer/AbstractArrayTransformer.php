@@ -7,6 +7,7 @@ use Jane\Component\AutoMapper\Extractor\WriteMutator;
 use Jane\Component\AutoMapper\Generator\UniqueVariableScope;
 use PhpParser\Node\Arg;
 use PhpParser\Node\Expr;
+use PhpParser\Node\Name;
 use PhpParser\Node\Stmt;
 
 /**
@@ -41,7 +42,14 @@ abstract class AbstractArrayTransformer implements TransformerInterface, Depende
         [$output, $itemStatements] = $this->itemTransformer->transform($loopValueVar, $target, $propertyMapping, $uniqueVariableScope);
 
         if ($propertyMapping->getWriteMutator()->getType() === WriteMutator::TYPE_ADDER) {
-            $itemStatements[] = new Stmt\Expression($propertyMapping->getWriteMutator()->getExpression($target, $output, $assignByRef));
+            $mappedValueVar = new Expr\Variable($uniqueVariableScope->getUniqueName('mappedValue'));
+            $itemStatements[] = new Stmt\Expression(new Expr\Assign($mappedValueVar, $output));
+            $itemStatements[] = new Stmt\If_(new Expr\BinaryOp\NotIdentical(new Expr\ConstFetch(new Name('null')), $mappedValueVar), [
+                'stmts' => [
+                    new Stmt\Expression($propertyMapping->getWriteMutator()->getExpression($target, $mappedValueVar, $assignByRef)),
+                ],
+            ]);
+
         } else {
             $itemStatements[] = new Stmt\Expression($this->getAssignExpr($valuesVar, $output, $loopKeyVar, $assignByRef));
         }
